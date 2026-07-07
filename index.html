@@ -3,50 +3,55 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Maze Game</title>
+    <title>Cute Maze for Fatemeh</title>
     <style>
         body {
             display: flex;
             flex-direction: column;
             align-items: center;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f4f4f9;
-            margin-top: 40px;
-            color: #333;
+            font-family: 'Comic Sans MS', 'Fredoka One', cursive, sans-serif;
+            background-color: #fff0f3; /* Soft pastel pink */
+            margin-top: 30px;
+            color: #c9184a;
         }
         h1 {
             margin-bottom: 5px;
+            font-size: 2rem;
+            text-shadow: 2px 2px 4px rgba(255, 179, 198, 0.5);
         }
         p {
             margin-bottom: 20px;
-            color: #666;
+            color: #ff748c;
+            font-size: 1.1rem;
         }
         canvas {
-            background-color: #fff;
-            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
-            border-radius: 4px;
-            border: 4px solid #2c3e50;
+            background-color: #ffffff;
+            box-shadow: 0 12px 24px rgba(255, 143, 171, 0.3);
+            border-radius: 15px;
+            border: 6px solid #ffb3c6;
         }
         #message {
-            margin-top: 25px;
-            font-size: 1.5rem;
+            margin-top: 20px;
+            font-size: 2rem;
             font-weight: bold;
-            color: #27ae60;
-            height: 30px;
+            color: #ff4d6d;
+            height: 40px;
+            text-shadow: 1px 1px 3px rgba(255, 77, 109, 0.3);
         }
         .controls {
-            margin-top: 15px;
-            font-size: 0.9rem;
-            color: #888;
+            margin-top: 10px;
+            font-size: 0.95rem;
+            color: #ff8fab;
         }
     </style>
 </head>
 <body>
 
-    <h1>Canvas Maze Game</h1>
-    <p>Use your <strong>Arrow Keys</strong> to reach the green goal!</p>
+    <h1>Find Your Way! 🎀</h1>
+    <p>Use your <strong>Arrow Keys</strong> to guide the ❤️ to the 💌</p>
     
-    <canvas id="mazeCanvas" width="400" height="400"></canvas>
+    <!-- Increased canvas size and grid size for a harder maze -->
+    <canvas id="mazeCanvas" width="600" height="600"></canvas>
     
     <div id="message"></div>
     <div class="controls">Refresh the page to generate a new maze.</div>
@@ -56,9 +61,9 @@
         const ctx = canvas.getContext('2d');
         const messageEl = document.getElementById('message');
 
-        // Maze settings
-        const cols = 20; // Number of columns
-        const rows = 20; // Number of rows
+        // Harder Maze settings
+        const cols = 35; // Increased columns for difficulty
+        const rows = 35; // Increased rows for difficulty
         const w = canvas.width / cols;
         const h = canvas.height / rows;
 
@@ -81,8 +86,8 @@
                 const x = this.i * w;
                 const y = this.j * h;
                 
-                ctx.strokeStyle = "#2c3e50";
-                ctx.lineWidth = 2;
+                ctx.strokeStyle = "#ffb3c6"; // Cute pink walls
+                ctx.lineWidth = 2.5;
                 ctx.lineCap = "round";
                 
                 if (this.walls[0]) { ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x + w, y); ctx.stroke(); }
@@ -112,13 +117,11 @@
             }
         }
 
-        // Helper function to get 1D array index from 2D coordinates
         function index(i, j) {
             if (i < 0 || j < 0 || i > cols - 1 || j > rows - 1) return -1;
             return i + j * cols;
         }
 
-        // Helper function to carve a path between two cells
         function removeWalls(a, b) {
             const x = a.i - b.i;
             if (x === 1) { a.walls[3] = false; b.walls[1] = false; }
@@ -129,14 +132,14 @@
             else if (y === -1) { a.walls[2] = false; b.walls[0] = false; }
         }
 
-        // 1. Initialize Grid
+        // Initialize Grid
         for (let j = 0; j < rows; j++) {
             for (let i = 0; i < cols; i++) {
                 grid.push(new Cell(i, j));
             }
         }
 
-        // 2. Generate Maze (Depth-First Search Recursive Backtracker)
+        // Generate Maze (Depth-First Search)
         let current = grid[0];
         current.visited = true;
         let generating = true;
@@ -151,11 +154,11 @@
             } else if (stack.length > 0) {
                 current = stack.pop();
             } else {
-                generating = false; // Maze is complete
+                generating = false;
             }
         }
 
-        // 3. Render Game
+        // Render Game
         function draw() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             
@@ -164,23 +167,29 @@
                 grid[i].show();
             }
 
-            // Draw Goal (Green)
-            ctx.fillStyle = "#27ae60";
-            ctx.fillRect(goal.i * w + 4, goal.j * h + 4, w - 8, h - 8);
+            // Text settings for emojis
+            ctx.font = (w * 0.7) + "px Arial";
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
 
-            // Draw Player (Red)
-            ctx.fillStyle = "#e74c3c";
-            ctx.fillRect(player.i * w + 4, player.j * h + 4, w - 8, h - 8);
+            // Draw Goal (Love Letter Emoji)
+            const goalX = goal.i * w + w / 2;
+            const goalY = goal.j * h + h / 2 + 1;
+            ctx.fillText("💌", goalX, goalY);
+
+            // Draw Player (Heart Emoji)
+            const playerX = player.i * w + w / 2;
+            const playerY = player.j * h + h / 2 + 1;
+            ctx.fillText("❤️", playerX, playerY);
         }
 
         // Initial Draw
         draw();
 
-        // 4. Handle Player Movement
+        // Handle Player Movement
         window.addEventListener('keydown', (e) => {
-            if (gameWon) return; // Stop movement if game is won
+            if (gameWon) return; 
             
-            // Prevent default scrolling for arrow keys
             if(["ArrowUp","ArrowDown","ArrowLeft","ArrowRight"].indexOf(e.code) > -1) {
                 e.preventDefault();
             }
@@ -195,10 +204,10 @@
 
             if (moved) {
                 draw();
-                // Check Win Condition
+                // Check Win Condition with new message
                 if (player.i === goal.i && player.j === goal.j) {
                     gameWon = true;
-                    messageEl.innerText = "🎉 You Win!";
+                    messageEl.innerText = "💖 i love you fatemeh 💖";
                 }
             }
         });
